@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="action_limpiar" type="id">limpiar</item>
+    <item name="action_listaArticulos" type="id">listaArticulos</item>
+    <item name="action_listaArticulos1" type="id">listaArticulos1</item>
+</resources>
