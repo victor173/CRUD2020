@@ -1,54 +1,66 @@
 package com.example.crud2020;
 
+import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.WindowManager;
+import android.widget.EditText;
+import android.widget.TextView;
+import  android.widget.Toast;
+import  android.widget.Button;
+
+import  android.database.Cursor;
+import  android.database.sqlite.SQLiteDatabase;
+import  android.content.Intent;
+
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import android.view.View;
+
+
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import android.content.ContentValues;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.view.KeyEvent;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+
+import android.view.View;
+
 import android.view.Menu;
 import android.view.MenuItem;
 
+import entidades.ConexionSQLite;
+import entidades.DTO;
+import modal.Modal;
+
 public class MainActivity extends AppCompatActivity {
-    private EditText et_codigo, et_descripcion, et_precio;
-    private Button btn_guardar, btn_consultar1, btn_consultar2, btn_eliminar, btn_actualizar;
-    private TextView tv_resultado;
 
-    boolean inputEt = false;
-    boolean inputEd = false;
+    private EditText etcod,etdesc,etpz;
+    private Button btng,btnbcod,btndes,btnmod,btndell;
+    private TextView result;
+
+    boolean inputET = false;
+    boolean inputED = false;
     boolean input1 = false;
-    int resultadoInsert = 0;
+    int resultInsert = 0;
 
-    Modal ventanas = new Modal();
+   // "Despues se activa"
+   Modal ventanas = new Modal();
     ConexionSQLite conexion = new ConexionSQLite(this);
-    Dto datos = new Dto();
-    AlertDialog.Builder dialogo;
+    DTO dato = new DTO();
+    AlertDialog.Builder wiuwiu;
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
+    public boolean onKeyDown(int KeyCode, KeyEvent event){
+        if (KeyCode == KeyEvent.KEYCODE_BACK){
             new android.app.AlertDialog.Builder(this)
-                    .setIcon(R.drawable.ic_baseline_close_24)
-                    .setTitle("Warning")
-                    .setMessage("¿Realmente desea salir?")
-                    .setNegativeButton(android.R.string.cancel, null)
+                    .setIcon(R.drawable.cancel)
+                    .setTitle("Advertencia")
+                    .setMessage("¿Quieres salir?")
+                    .setNegativeButton(android.R.string.cancel,null)
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(DialogInterface dialogInterface, int i) {
                             finishAffinity();
                         }
                     })
@@ -56,8 +68,11 @@ public class MainActivity extends AppCompatActivity {
 
             return true;
         }
-        return super.onKeyDown(keyCode, event);
+
+        return  super.onKeyDown(KeyCode,event);
+
     }
+
 
 
     @Override
@@ -65,21 +80,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_back));
-        toolbar.setTitleTextColor(getResources().getColor(R.color.mycolor1));
-        toolbar.setTitleMargin(0, 0, 0, 0);
-        toolbar.setSubtitle("CRUD SQLite-2020");
-        toolbar.setSubtitleTextColor(getResources().getColor(R.color.mycolor));
-        toolbar.setTitle("Victor Roque");
+        toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.close));
+        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+        toolbar.setTitleMargin(0,0,0,0);
+        toolbar.setSubtitle("CRUD 2020 SQLite ");
+        toolbar.setSubtitleTextColor(getResources().getColor(R.color.white));
+        toolbar.setTitle("SIS22B");
         setSupportActionBar(toolbar);
 
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                confirmacion();
+                comfirmacion();
             }
         });
 
@@ -87,64 +102,90 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                //  .setAction("Action", null).show();
                 ventanas.Search(MainActivity.this);
             }
         });
-        et_codigo = (EditText) findViewById(R.id.et_codigo);
-        et_descripcion = (EditText) findViewById(R.id.et_descripcion);
-        et_precio = (EditText) findViewById(R.id.et_precio);
-        btn_guardar = (Button) findViewById(R.id.btn_guardar);
-        btn_consultar1 = (Button) findViewById(R.id.btn_consultar1);
-        btn_consultar2 = (Button) findViewById(R.id.btn_consultar2);
-        btn_eliminar = (Button) findViewById(R.id.btn_eliminar);
-        btn_actualizar = (Button) findViewById(R.id.btn_actualizar);
 
-        String senal = "";
+        etcod = (EditText) findViewById(R.id.et1);
+        etdesc = (EditText) findViewById(R.id.et2);
+        etpz = (EditText) findViewById(R.id.et3);
+
+        btnbcod = (Button) findViewById(R.id.concod);
+        btndes = (Button) findViewById(R.id.condes);
+        btng = (Button) findViewById(R.id.btgrd);
+        btnmod = (Button) findViewById(R.id.btnmod);
+        btndell = (Button) findViewById(R.id.btdell);
+
+        String signal = "";
         String codigo = "";
-        String descripcion = "";
-        String precio = "";
+        String desc = "";
+        String prezio = "";
 
         try {
-            Intent intent = getIntent();
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                codigo = bundle.getString("codigo");
-                senal = bundle.getString("senal");
-                descripcion = bundle.getString("descripcion");
-                precio = bundle.getString("precio");
-                if (senal.equals("1")) {
-                    et_codigo.setText(codigo);
-                    et_descripcion.setText(descripcion);
-                    et_precio.setText(precio);
-                }
-            }
-        } catch (Exception e) {
 
+            Bundle bun = getIntent().getExtras();
+            if (bun != null){
+
+               String a = (String) bun.get("codigo");
+                String b = (String) bun.get("descr");
+                String c = (String) bun.get("codigo");
+                signal = bun.getString("pe");
+                desc = bun.getString("de");
+                prezio = bun.getString("pe");
+
+                    etcod.setText(a);
+                    etdesc.setText(b);
+                    etpz.setText(c);
+
+            }
+
+        }catch (Exception o){
+            //AQUI SAMPARE UN TOAST CUANDO ME ACUERDE SINO ME AVISAN
         }
+
 
     }
 
-    private void confirmacion() {
-        String mensaje = "¿Realmente desea salir?";
-        dialogo = new AlertDialog.Builder(MainActivity.this);
-        dialogo.setIcon(R.drawable.ic_baseline_close_24);
-        dialogo.setTitle("Warning");
-        dialogo.setMessage(mensaje);
-        dialogo.setCancelable(false);
-        dialogo.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialogo, int id) {
+
+    private void comfirmacion(){
+        String msm = "¿Quieres salir";
+        wiuwiu = new AlertDialog.Builder(MainActivity.this);
+        wiuwiu.setIcon(R.drawable.cancel);
+        wiuwiu.setTitle("Advertencia");
+        wiuwiu.setMessage(msm);
+        wiuwiu.setCancelable(false);
+        wiuwiu.setPositiveButton("SI", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
                 MainActivity.this.finish();
             }
         });
-        dialogo.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialogo, int id) {
+
+        wiuwiu.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
 
             }
         });
-        dialogo.show();
+
+        wiuwiu.show();
+
     }
+
+    public void limpiardat(){
+
+        etcod.setText(null);
+        etdesc.setText(null);
+        etpz.setText(null);
+    }
+
+    public void limpiardat2(View view){
+
+        etcod.setText(null);
+        etdesc.setText(null);
+        etpz.setText(null);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -161,163 +202,178 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_limpiar) {
+        if (id == R.id.action_settings) {
+            return true;
+        }else if (id == R.id.action_listaArt){
+            Intent spinnerAct = new Intent(MainActivity.this,activity_consulta.class);
+            startActivity(spinnerAct);
+            return true;
+        }else if (id == R.id.action_listaArt1){
+            Intent listVAct = new Intent(MainActivity.this,listview_articulos.class);
+            startActivity(listVAct);
+            return  true;
 
-            et_codigo.setText(null);
-            et_descripcion.setText(null);
-            et_precio.setText(null);
-        } else if (id == R.id.action_listaArticulos) {
-            Intent spinnerActivity = new Intent(MainActivity.this, ConsultaSpinner.class);
-            startActivity(spinnerActivity);
-            return true;
-        } else if (id == R.id.action_listaArticulos1) {
-            Intent listViewActivity = new Intent(MainActivity.this, ListViewArticulos.class);
-            startActivity(listViewActivity);
-            return true;
+        }else if (id == R.id.action_recylist){
+            Intent listVAct = new Intent(MainActivity.this,consultarecy.class);
+            startActivity(listVAct);
+            return  true;
+
         }
+
+
+
         return super.onOptionsItemSelected(item);
     }
 
-    public void alta(View v) {
-        if (et_codigo.getText().toString().length() == 0) {
-            et_codigo.setError("Campo obligatorio");
-            inputEt = false;
-        } else {
-            inputEt = true;
+    public void guardar (View view){
+        if (etcod.getText().toString().length()== 0){
+            etcod.setError("Campo obligatorio");
+            inputET = false;
+        }else {
+            inputET = true;
         }
-        if (et_descripcion.getText().toString().length() == 0) {
-            et_descripcion.setError("Campo obligatorio");
-            inputEd = false;
-        } else {
-            inputEd = true;
+
+
+        if (etdesc.getText().toString().length()==0){
+            etdesc.setError("Campo obligatorio");
+            inputED = false;
+        }else {
+            inputED = true;
         }
-        if (et_precio.getText().toString().length() == 0) {
-            et_precio.setError("Campo obligatorio");
+
+
+        if (etpz.getText().toString().length()== 0){
+            etpz.setError("Campo obligatorio");
             input1 = false;
-        } else {
+        }else{
             input1 = true;
         }
-        if (inputEt && inputEd && input1) {
+
+
+        if (inputET && inputED && input1){
             try {
-                datos.setCodigo(Integer.parseInt(et_codigo.getText().toString()));
-                datos.setDescripcion(et_descripcion.getText().toString());
-                datos.setPrecio(Double.parseDouble(et_precio.getText().toString()));
-                if (conexion.InserTradicional(datos)) {
-                    Toast.makeText(this, "Registro agregado satisfactoriamente!", Toast.LENGTH_SHORT).show();
-                    limpiarDatos();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Error. Ya existe un registro\n" + "Codigo: "
-                            + et_codigo.getText().toString(), Toast.LENGTH_LONG).show();
-                    limpiarDatos();
+                dato.setCodigo(Integer.parseInt(etcod.getText().toString()));
+                dato.setDescripcion(etdesc.getText().toString());
+                dato.setPrecio(Double.parseDouble(etpz.getText().toString()));
+
+                if (conexion.InsertTradicional(dato)){
+                    Toast.makeText(this,"Registro Agregado ",Toast.LENGTH_SHORT).show();
+                    limpiardat();
+                }else {
+                    Toast.makeText(this,"Ya existe el registro"+etcod.getText().toString(),Toast.LENGTH_LONG).show();
                 }
-            } catch (Exception e) {
-                Toast.makeText(this, "ERROR. Ya eiste. ", Toast.LENGTH_SHORT).show();
+            }catch (Exception o){
+
+                Toast.makeText(this,"Hubo un Error el algo",Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    public void mensaje(String mensaje) {
-        Toast.makeText(this, "" + mensaje, Toast.LENGTH_SHORT).show();
+    public  void mensaje(String msm){
+        Toast.makeText(this," "+msm,Toast.LENGTH_SHORT).show();
     }
 
-    private void limpiarDatos() {
-        et_codigo.setText(null);
-        et_descripcion.setText(null);
-        et_precio.setText(null);
-        et_codigo.requestFocus();
-    }
+    public  void consultcod (View view){
+        if (etcod.getText().toString().length()== 0){
+            etcod.setError("Campo obligatorio");
+            inputET = false;
+        }else {
+            inputET = true;
+        }
 
-    public void consultaporcodigo(View v) {
-        if (et_codigo.getText().toString().length() == 0) {
-            et_codigo.setError("Campo obligatorio");
-            inputEt = false;
-        } else {
-            inputEt = true;
-        }
-        if (inputEt) {
-            String codigo = et_codigo.getText().toString();
-            datos.setCodigo(Integer.parseInt(codigo));
-            if (conexion.consultaArticulos(datos)) {
-                et_descripcion.setText(datos.getDescripcion());
-                et_precio.setText("" + datos.getPrecio());
-            } else {
-                Toast.makeText(this, "No existe un articulo con dicho código", Toast.LENGTH_SHORT).show();
-                limpiarDatos();
-            }
-        } else {
-            Toast.makeText(this, "Ingrese el código del articulo a buscar.",
-                    Toast.LENGTH_SHORT).show();
-        }
-    }
-    public void consultapordescripcion(View v){
-        if (et_descripcion.getText().toString().length()==0){
-            et_descripcion.setError("Campo obligatorio");
-            inputEd = false;
-        }else{
-            inputEd=true;
-        }
-        if (inputEd){
-            String descripcion = et_descripcion.getText().toString();
-            datos.setDescripcion(descripcion);
-            if (conexion.consultaDescripcion(datos)){
-                et_codigo.setText(""+datos.getCodigo());
-                et_descripcion.setText(datos.getDescripcion());
-                et_precio.setText(""+datos.getPrecio());
+        if (inputET){
+            String codigo = etcod.getText().toString();
+            dato.setCodigo(Integer.parseInt(codigo));
 
+            if (conexion.consultArt(dato)){
+                etdesc.setText(dato.getDescripcion());
+                etpz.setText(""+dato.getPrecio());
             }else{
-                Toast.makeText(this,"No existe un articulo con dicha descripción",
-                        Toast.LENGTH_SHORT).show();
-                limpiarDatos();
+
+                Toast.makeText(this,"No existe el articulo ese",Toast.LENGTH_SHORT).show();
+                limpiardat();
             }
         }else{
-            Toast.makeText(this,"ingrese la descripción del articulo a buscar.",
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Ingrese el articulo por favor",Toast.LENGTH_SHORT).show();
+
         }
+
     }
 
-    public void bajaporcodigo(View view) {
-        if (et_codigo.getText().toString().length()==0){
-            et_codigo.setError("Campo obligatorio");
-            inputEt=false;
-        }else{
-            inputEt=true;
+    public  void consuldesc (View view){
+        if (etdesc.getText().toString().length()== 0){
+            etdesc.setError("Campo obligatorio");
+            inputED = false;
+        }else {
+            inputED = true;
         }
-        if (inputEt){
-            String cod = et_codigo.getText().toString();
-            datos.setCodigo(Integer.parseInt(cod));
-            if (conexion.bajaCodigo(MainActivity.this,datos)){
-                limpiarDatos();
-            }else{
-                Toast.makeText(this,"No existe un articulo con dicho código.",
-                        Toast.LENGTH_SHORT).show();
-                limpiarDatos();
+
+        if (inputED){
+            String desc = etdesc.getText().toString();
+            dato.setDescripcion(desc);
+            if (conexion.cosultDesc(dato)){
+                etcod.setText(""+dato.getCodigo());
+                etdesc.setText(dato.getDescripcion());
+                etpz.setText(""+dato.getPrecio());
+
+            }else {
+                Toast.makeText(this,"No existe tal articulo",Toast.LENGTH_SHORT).show();
+                limpiardat();
+
+            }
+        }else {
+            Toast.makeText(this,"Ingrese el articulo por descripcion por favor",Toast.LENGTH_SHORT).show();
+        }
+
+
+    }
+
+    public  void bajacod(View view){
+        if (etcod.getText().toString().length()== 0){
+            etcod.setError("Campo obligatorio");
+            inputET = false;
+        }else {
+            inputET = true;
+        }
+
+        if (inputET){
+            String codmw = etcod.getText().toString();
+            dato.setCodigo(Integer.parseInt(codmw));
+            if (conexion.delCod(MainActivity.this,dato)){
+                limpiardat();
+
+            }else {
+                Toast.makeText(this,"Ingrese el articulo ",Toast.LENGTH_SHORT).show();
+                limpiardat();
             }
         }
-    }
-    public void modificacion(View view) {
-        if (et_codigo.getText().toString().length()==0){
-            et_codigo.setError("Campo obligatorio");
-            inputEt = false;
-        }else{
-            inputEt= true;
-        }
-        if (inputEt){
-            String cod = et_codigo.getText().toString();
-            String descripcion = et_descripcion.getText().toString();
-            double precio = Double.parseDouble(et_precio.getText().toString());
 
-            datos.setCodigo(Integer.parseInt(cod));
-            datos.setDescripcion(descripcion);
-            datos.setPrecio(precio);
-            if (conexion.modificar(datos)){
-                Toast.makeText(this,"Registro Modificado Correctamente.",
-                        Toast.LENGTH_SHORT).show();
-            }else{
-                Toast.makeText(this,"No se han encontrado resultado para la busqueda especificada.",
-                        Toast.LENGTH_SHORT).show();
+    }
+
+
+    public void modi (View view){
+        if (etcod.getText().toString().length()== 0){
+            etcod.setError("Campo obligatorio");
+            inputET = false;
+        }else {
+            inputET = true;
+        }
+
+        if (inputET){
+            String cod = etcod.getText().toString();
+            String desc = etdesc.getText().toString();
+            double prezio = Double.parseDouble(etpz.getText().toString());
+
+            dato.setCodigo(Integer.parseInt(cod));
+            dato.setDescripcion(desc);
+            dato.setPrecio(prezio);
+
+            if (conexion.mod(dato)){
+                Toast.makeText(this,"Editado",Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(this,"No se encotro el art a modificar el articulo ",Toast.LENGTH_SHORT).show();
+
             }
         }
     }
 }
-
-

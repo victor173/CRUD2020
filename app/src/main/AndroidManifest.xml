@@ -9,22 +9,22 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".DetalleArticulos"></activity>
-        <activity
-                android:configChanges="screenSize|orientation"
-                android:windowSoftInputMode="stateHidden"
-                android:name=".ListViewArticulos"/>
-        <activity android:name=".ConsultaSpinner"/>
+        <activity android:name=".consultarecy"></activity>
+        <activity android:name=".recyclear" />
+        <activity android:name=".activity_detalle_articulos" />
+        <activity android:name=".listview_articulos" />
+        <activity android:name=".activity_consulta" />
         <activity
                 android:name=".MainActivity"
                 android:label="@string/app_name"
                 android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".fabase" />
     </application>
 
 </manifest>
